@@ -192,16 +192,19 @@ def create_google_client(config):
     }
     """
 
-    if config.get("google_credentials"):
+    scopes = config.get("scopes")
+
+    if config.get("google_credentials") and bool(config["google_credentials"]):
         credentials = service_account.Credentials.from_service_account_info(
             config["google_credentials"]
         )
+        if scopes:
+            credentials = credentials.with_scopes(scopes)
     else:
-        credentials, project = google.auth.default()
-
-    scopes = config.get("scopes")
-    if scopes:
-        credentials = credentials.with_scopes(scopes)
+        if scopes:
+            credentials, project = google.auth.default(scopes=scopes)
+        else:
+            credentials, project = google.auth.default()
 
     http = sr.build_http_connection(config, timeout=config.get("pulling_interval", 30))
     http = AuthorizedHttp(credentials, http=http)
