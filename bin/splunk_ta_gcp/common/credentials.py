@@ -1,6 +1,7 @@
+import logging
 import json
 from google.oauth2 import service_account
-from google.auth import compute_engine
+import google.auth
 
 class CredentialFactory(object):
     def __init__(self, config):
@@ -13,6 +14,7 @@ class CredentialFactory(object):
         info = json.loads(key)
 
         if not bool(info): # bool(dict) evaluates to False if empty
-            return compute_engine.Credentials()
-            
+            credentials, _ = google.auth.default()
+            return credentials
+
         return service_account.Credentials.from_service_account_info(info, scopes=scopes)
