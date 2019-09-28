@@ -1,0 +1,1 @@
+{"resource": {"labels": {"project_id": "##Project_Id##", "zone": "##Zone##", "instance_id": "##Instance_Id##"}, "type": "##Type##"}, "metricKind": "##Metrickind##", "points": [{"interval": {"startTime": "##Starttime##", "endTime": "##Endtime##"}, "value": {"doubleValue": ##Double_Value##}}], "metric": {"type": "##Metric_Type##"}, "valueType": "##Valuetype##"}

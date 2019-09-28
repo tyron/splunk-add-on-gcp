@@ -1,0 +1,16 @@
+com.google.cloud/services/compute-engine/VmimageF1Micro,Micro instance with burstable CPU running in ##Countryname##,com.google.cloud/services/compute-engine/VmimageF1Micro
+com.google.cloud/services/compute-engine/VmimageN1Standard_1,Standard Intel N1 1 VCPU running in ##Countryname##,com.google.cloud/services/compute-engine/VmimageN1Standard_1
+com.google.cloud/services/compute-engine/NetworkInternetIngressAuNa,Network Internet Ingress from Australia to ##Countryname##,com.google.cloud/services/compute-engine/NetworkInternetIngressAuNa
+com.google.cloud/services/compute-engine/NetworkInternetIngressApacNa,Network Internet Ingress from APAC to ##Countryname##,com.google.cloud/services/compute-engine/NetworkInternetIngressApacNa
+com.google.cloud/services/compute-engine/NetworkInternetIngressEuNa,Network Internet Ingress from EMEA to ##Countryname##,com.google.cloud/services/compute-engine/NetworkInternetIngressEuNa
+com.google.cloud/services/compute-engine/NetworkInternetIngressNaNa,Network Internet Ingress from ##Countryname## to ##Countryname##,com.google.cloud/services/compute-engine/NetworkInternetIngressNaNa
+com.googleapis/services/pubsub/SubscriptionBacklog,Subscriptions data backlog,com.googleapis/services/pubsub/Subscription_backlog_size
+com.google.cloud/services/compute-engine/NetworkInternetIngressCnNa,Network Internet Ingress from China to ##Countryname##,com.google.cloud/services/compute-engine/NetworkInternetIngressCnNa
+com.googleapis/services/pubsub/MessageOperations,Message Operations,com.googleapis/services/pubsub/Message_operation
+com.google.cloud/services/compute-engine/NetworkInternetEgressNaApac,Network Internet Egress from ##Countryname## to APAC,com.google.cloud/services/compute-engine/NetworkInternetEgressNaApac
+com.google.cloud/services/compute-engine/StoragePdCapacity,Storage PD Capacity,com.google.cloud/services/compute-engine/StoragePdCapacity
+com.google.cloud/services/compute-engine/NetworkInternetEgressNaCn,Network Internet Egress from ##Countryname## to China,com.google.cloud/services/compute-engine/NetworkInternetEgressNaCn
+com.google.cloud/services/compute-engine/NetworkInternetEgressNaNa,Network Internet Egress from ##Countryname## to ##Countryname##,com.google.cloud/services/compute-engine/NetworkInternetEgressNaNa
+com.google.cloud/services/compute-engine/NetworkInternetEgressNaEu,Network Internet Egress from ##Countryname## to EMEA,com.google.cloud/services/compute-engine/NetworkInternetEgressNaEu
+com.google.cloud/services/cloud-storage/StorageDurableReducedRedundancyGbsec,Durable Reduced Availability Storage,com.google.cloud/services/cloud-storage/StorageDurableReducedRedundancyGbsec
+com.google.cloud/services/cloud-storage/BandwidthDownloadChina,Download China,com.google.cloud/services/cloud-storage/BandwidthDownloadChina

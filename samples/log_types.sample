@@ -1,0 +1,6 @@
+compute.googleapis.com/activity_log
+syslog
+cloudaudit.googleapis.com/data_access
+cloudaudit.googleapis.com/activity
+apache-access
+apache-error
