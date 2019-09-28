@@ -1,4 +1,3 @@
-import logging
 import json
 from google.oauth2 import service_account
 import google.auth
