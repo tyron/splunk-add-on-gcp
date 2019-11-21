@@ -25,6 +25,7 @@ Working with main thread logging and passing context to sub-threads
 """
 
 from __future__ import absolute_import
+from builtins import object
 import json.encoder as encode
 import logging as log4py
 from logging import LoggerAdapter, Formatter
@@ -36,6 +37,10 @@ import threading
 import sys
 from splunksdc import environ
 
+try:
+    unicode
+except NameError:
+    unicode = str
 
 __all__ = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL', 'StreamHandler',
            'RotatingFileHandler', 'LogContextAdapter',
@@ -48,7 +53,7 @@ encode_basestring = encode.encode_basestring
 
 def _dict2str(kv):
     kvs = []
-    for key, value in kv.iteritems():
+    for key, value in list(kv.items()):
         if isinstance(value, unicode):
             value = value.encode('utf-8')
         if isinstance(value, str):
@@ -268,7 +273,7 @@ class RotatingFileHandlerFactory(object):
         handler = RotatingFileHandler(
             filepath, maxBytes=1024 * 1024 * 25, backupCount=5, delay=True
         )
-        if os.name == 'nt':
+        if os.name == 'nt' and sys.version_info < (3,):
             handler.mode = 'aN'
         return handler
 

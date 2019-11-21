@@ -5,11 +5,15 @@ Note: It manages inputs.conf
 """
 
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from six import string_types as basestring
 import json
 import logging
 import collections
-from urllib import quote
-
+from urllib.parse import quote
+import sys
 from splunk import admin, rest
 
 from . import base, util
@@ -146,7 +150,7 @@ class DataInputHandler(base.BaseRestHandler):
                 self.callerArgs.id is not None) and ('/' + eid) or ''
         return (rest.makeSplunkdUri() + 'servicesNS/' + user + '/' + app +
                 '/data/inputs/' + self.dataInputName + name +
-                '?output_mode=json')
+                '?output_mode=json&count=0')
 
     def convertErrMsg(self, errMsg):
         err = json.loads(errMsg)
@@ -154,11 +158,13 @@ class DataInputHandler(base.BaseRestHandler):
 
     def convert(self, data):
         if isinstance(data, basestring):
+            if sys.version_info[0] > 2:
+                return data
             return data.encode('utf-8')
         elif isinstance(data, collections.Mapping):
-            return dict(map(self.convert, data.iteritems()))
+            return dict(list(map(self.convert, iter(data.items()))))
         elif isinstance(data, collections.Iterable):
-            return type(data)(map(self.convert, data))
+            return type(data)(list(map(self.convert, data)))
         else:
             return data
 

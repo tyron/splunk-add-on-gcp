@@ -1,4 +1,10 @@
-import Queue
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+import queue
 import multiprocessing
 import threading
 import sys
@@ -58,7 +64,7 @@ class ModinputEvent(object):
             res = "".join((self._do_format(
                 evt, evt_fmt, index, host, source, sourcetype, time)
                 for evt in events))
-        elif isinstance(events, (str, unicode)):
+        elif isinstance(events, (str, str)):
             res = self._do_format(
                 events, evt_fmt, index, host, source, sourcetype, time)
         elif isinstance(events, dict):
@@ -87,7 +93,7 @@ class ModinputEventWriter(object):
             self._mgr = multiprocessing.Manager()
             self._event_queue = self._mgr.Queue(1000)
         else:
-            self._event_queue = Queue.Queue(1000)
+            self._event_queue = queue.Queue(1000)
         self._event_writer = threading.Thread(target=self._do_write_events)
         self._started = False
 
@@ -133,7 +139,7 @@ class ModinputEventWriter(object):
         while 1:
             try:
                 events = event_queue.get(timeout=3)
-            except Queue.Empty:
+            except queue.Empty:
                 # We need drain the queue before shutdown
                 # timeout means empty for now
                 if got_shutdown_signal:
@@ -143,7 +149,7 @@ class ModinputEventWriter(object):
                     continue
 
             if events is not None:
-                if isinstance(events, (str, unicode)):
+                if isinstance(events, (str, str)):
                     # for legacy interface
                     write(events)
                 else:
@@ -240,7 +246,7 @@ class HecEventWriter(object):
         last_ex = None
         events = self._prepare_events(events)
         for event in events:
-            for _ in xrange(retry):
+            for _ in range(retry):
                 try:
                     response, content = sr.splunkd_request(
                         self._uri, self._config["token"], method="POST",
@@ -379,15 +385,15 @@ if __name__ == "__main__":
                     sourcetype="test:json", time=time.time(),
                     unbroken=unbroken, done=done, events=events)
                 index_events.append(evt)
-                print evt.to_string()
+                print(evt.to_string())
 
-    print "\n\n"
+    print("\n\n")
     writer = ModinputEventWriter()
     writer.start()
     writer.write_events(index_events)
     writer.tear_down()
 
-    print "\n\n"
+    print("\n\n")
     writer = ModinputEventWriter(process_safe=True)
     writer.start()
     writer.write_events(index_events)

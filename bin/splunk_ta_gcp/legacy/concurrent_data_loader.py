@@ -1,5 +1,8 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import threading
-import Queue
+import queue
 from multiprocessing import Manager
 from multiprocessing import Process
 import os
@@ -34,7 +37,7 @@ def _wait_for_tear_down(tear_down_q, loader):
     while 1:
         try:
             go_exit = tear_down_q.get(block=True, timeout=2)
-        except Queue.Empty:
+        except queue.Empty:
             go_exit = checker.is_orphan()
             if go_exit:
                 logger.info("%s becomes orphan, going to exit", os.getpid())
@@ -97,7 +100,7 @@ class GoogleDataLoaderManager(object):
 
     def __init__(self, task_configs):
         self._task_configs = task_configs
-        self._wakeup_queue = Queue.Queue()
+        self._wakeup_queue = queue.Queue()
         self._timer_queue = tq.TimerQueue()
         self._mgr = None
         self._started = False
@@ -174,6 +177,6 @@ class GoogleDataLoaderManager(object):
             self._mgr = Manager()
             tear_down_q = self._mgr.Queue()
         else:
-            tear_down_q = Queue.Queue()
+            tear_down_q = queue.Queue()
         return tear_down_q
 

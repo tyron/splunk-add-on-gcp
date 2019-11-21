@@ -10,9 +10,9 @@ def parse_conf_xml_dom(xml_content):
     if not xml_content:
         return []
 
-    m = re.search(r'xmlns="([^"]+)"', xml_content)
+    m = re.search(r'xmlns="([^"]+)"', xml_content.decode('utf-8'))
     ns = m.group(1)
-    m = re.search(r'xmlns:s="([^"]+)"', xml_content)
+    m = re.search(r'xmlns:s="([^"]+)"', xml_content.decode('utf-8'))
     sub_ns = m.group(1)
     entry_path = "./{%s}entry" % ns
     stanza_path = "./{%s}title" % ns

@@ -1,3 +1,6 @@
+from builtins import str
+from builtins import zip
+from builtins import object
 import re
 import uuid
 from copy import deepcopy
@@ -26,7 +29,7 @@ class UCCServerConfigLoader(object):
             "Server Config locators cannot be empty: " + str((id_locator, logging_locator, local_forwarder_locator,
                                                               forwarders_snapshot_locator, dispatch_snapshot_locator))
 
-        _get_dct = lambda s: dict(zip(['schema', 'stanza', 'field'], re.split(r"\s*[>,]\s*", s)))
+        _get_dct = lambda s: dict(list(zip(['schema', 'stanza', 'field'], re.split(r"\s*[>,]\s*", s))))
 
         self.ousis = _get_dct(id_locator)
         self.ousls = _get_dct(logging_locator)
@@ -163,4 +166,4 @@ def _parse_schema(ucc_schema):
         return setting
 
     except KeyError as ex:
-        raise UccServerConfigException("Cannot find require key in schema file: {}".format(ex.message))
+        raise UccServerConfigException("Cannot find require key in schema file: {}".format(str(ex)))

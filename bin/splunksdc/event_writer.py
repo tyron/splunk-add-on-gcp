@@ -14,11 +14,15 @@ Example:
     device.write_fileobj(fileobj)
         
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import requests
 import uuid
-import cStringIO as StringIO
+import io as StringIO
 from datetime import datetime
-from urlparse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse
 from xml.sax import saxutils
 from splunksdc import log as logging
 
@@ -33,7 +37,12 @@ class EventWriter(object):
     def __init__(self):
         self._chunk_size = 4 * 1024 * 1024
 
+    def convert(self, value):
+        import sys
+        return (value.decode('utf-8') if sys.version_info < (3,) else value)
+
     def _read_multiple_lines(self, stream):
+        stream = self.convert(stream)
         fileobj = stream
         if isinstance(fileobj, str):
             fileobj = StringIO.StringIO(stream)
@@ -104,7 +113,7 @@ class XMLEventWriter(EventWriter):
     @classmethod
     def _render_metadata(cls, kwargs):
         metadata = {}
-        for key, value in kwargs.items():
+        for key, value in list(kwargs.items()):
             if not value:
                 continue
             if key in cls._METADATA_KEYS:
@@ -181,7 +190,7 @@ class HECWriter(EventWriter):
     @classmethod
     def _render_metadata(cls, kwargs):
         metadata = {}
-        for key, value in kwargs.items():
+        for key, value in list(kwargs.items()):
             if key in cls._METADATA_KEYS and value:
                 metadata[key] = value
         return metadata

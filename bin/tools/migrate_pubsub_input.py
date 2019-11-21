@@ -1,5 +1,8 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 import os
-import ConfigParser
+import configparser
 import shutil
 import codecs
 
@@ -19,7 +22,7 @@ def migrate_pubsub_inputs():
         print("Exit - no pubsub inputs were created.")
         return
 
-    old_config = ConfigParser.ConfigParser()
+    old_config = configparser.ConfigParser()
     with codecs.open(old_input_path, 'r', 'utf_8_sig') as fp:
         old_config.readfp(fp)
 
@@ -29,7 +32,7 @@ def migrate_pubsub_inputs():
         open(new_input_path, 'a').close()
 
     # open new config file
-    new_config = ConfigParser.ConfigParser()
+    new_config = configparser.ConfigParser()
     with codecs.open(new_input_path, 'r', 'utf_8_sig') as fp:
         new_config.readfp(fp)
 
@@ -74,11 +77,11 @@ def update_passwords_conf(old_config_name, new_config_name):
         print("Nothing to be updated in passwords.conf")
         return
 
-    old_passwords_conf = ConfigParser.ConfigParser()
+    old_passwords_conf = configparser.ConfigParser()
     with codecs.open(password_path, 'r', 'utf_8_sig') as fp:
         old_passwords_conf.readfp(fp)
 
-    new_passwords_conf = ConfigParser.ConfigParser()
+    new_passwords_conf = configparser.ConfigParser()
 
     for section in old_passwords_conf.sections():
         old_prefix = "credential:__REST_CREDENTIAL__#Splunk_TA_google-cloudplatform#configs/conf-{0}#".format(old_config_name)
@@ -116,7 +119,7 @@ def rename_conf_files(old_file_name, new_file_name):
         print("Exit - no {0}.conf were created.".format(old_file_name))
         return
 
-    old_config = ConfigParser.ConfigParser()
+    old_config = configparser.ConfigParser()
     with codecs.open(old_config_path, 'r', 'utf_8_sig') as fp:
         old_config.readfp(fp)
 
@@ -126,7 +129,7 @@ def rename_conf_files(old_file_name, new_file_name):
         open(new_config_path, 'a').close()
 
     # open new config file
-    new_config = ConfigParser.ConfigParser()
+    new_config = configparser.ConfigParser()
     with codecs.open(new_config_path, 'r', 'utf_8_sig') as fp:
         new_config.readfp(fp)
 

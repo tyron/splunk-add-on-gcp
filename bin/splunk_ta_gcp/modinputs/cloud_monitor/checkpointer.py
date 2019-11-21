@@ -1,9 +1,12 @@
+from builtins import object
 import base64
 from datetime import datetime, timedelta
-
 import splunktalib.state_store as sss
 import splunk_ta_gcp.legacy.consts as ggc
-from . import consts as gmc
+try :
+    from . import consts as gmc
+except ImportError:
+    import consts as gmc
 
 metric_date_fmt = "%Y-%m-%dT%H:%M:%S"
 
@@ -53,7 +56,7 @@ class GoogleCloudMonitorCheckpointer(object):
         key = "{stanza_name}|{metric_name}".format(
             stanza_name=config[ggc.name],
             metric_name=config[gmc.google_metrics])
-        self._key = base64.b64encode(key)
+        self._key = base64.b64encode(key.encode('utf-8'))
         self._store = sss.get_state_store(
             config, config[ggc.appname],
             collection_name=ggc.google_cloud_monitor,

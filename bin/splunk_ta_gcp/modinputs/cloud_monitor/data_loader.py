@@ -1,3 +1,4 @@
+from builtins import object
 import traceback
 import threading
 from datetime import datetime
@@ -6,10 +7,14 @@ import time
 from splunksdc import log as logging
 import splunk_ta_gcp.legacy.consts as ggc
 import splunk_ta_gcp.legacy.common as tacommon
-from . import wrapper as gmw
-from . import consts as gmc
-from . import checkpointer as ckpt
-
+try:
+    from . import wrapper as gmw
+    from . import consts as gmc
+    from . import checkpointer as ckpt
+except ImportError:
+    import wrapper as gmw
+    import consts as gmc
+    import checkpointer as ckpt
 
 logger = logging.get_module_logger()
 
@@ -130,7 +135,7 @@ class GoogleCloudMonitorDataLoader(object):
                     self._store.set_oldest(ckpt.strf_metric_date(oldest))
                     logger.info("Progress to %s", oldest)
                 elif (youngest - oldest).total_seconds() >= win:
-                    oldest += timedelta(seconds=win/2)
+                    oldest += timedelta(seconds=win//2)
                     self._store.set_oldest(ckpt.strf_metric_date(oldest))
                     logger.info("Progress to %s", oldest)
 

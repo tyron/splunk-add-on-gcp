@@ -2,6 +2,7 @@
 Snapshot management module.
 """
 
+from builtins import object
 from copy import deepcopy
 
 from splunktaucclib.common import md5_of_dict
@@ -88,7 +89,7 @@ class DispatchSnapshotManager(object):
         """
 
         with self._rwlock.writer_lock:
-            for name, value in deepcopy(self._dispatch_snapshot).iteritems():
+            for name, value in deepcopy(self._dispatch_snapshot).items():
                 if self.FORWARDER_LIST in value and \
                    forwarder in value[self.FORWARDER_LIST]:
                     self._dispatch_snapshot[name][self.FORWARDER_LIST].remove(
@@ -104,7 +105,7 @@ class DispatchSnapshotManager(object):
 
         global_settings = set()
         with self._rwlock.reader_lock:
-            for key in self._dispatch_snapshot.keys():
+            for key in list(self._dispatch_snapshot.keys()):
                 if key.split(self.SEP)[0] in \
                    self._dispatch_schema_manager.get_global_setting_schemas():
                     global_settings.add(key)
@@ -168,7 +169,7 @@ class DispatchSnapshotManager(object):
 
         inputs = set()
         with self._rwlock.reader_lock:
-            for key in self._dispatch_snapshot.keys():
+            for key in list(self._dispatch_snapshot.keys()):
                 if key.split(self.SEP)[0] in \
                    self._dispatch_schema_manager.get_input_schemas():
                     inputs.add(key)
@@ -234,7 +235,7 @@ class DispatchSnapshotManager(object):
 
         load = 0
         with self._rwlock.reader_lock:
-            for key, value in self._dispatch_snapshot.iteritems():
+            for key, value in self._dispatch_snapshot.items():
                 if key.split(self.SEP)[0] in \
                    self._dispatch_schema_manager.get_input_schemas() and \
                    value[self.FORWARDER] == forwarder:

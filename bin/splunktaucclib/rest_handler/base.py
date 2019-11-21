@@ -3,6 +3,8 @@
 
 from __future__ import absolute_import
 
+from builtins import str
+from builtins import object
 import logging
 import json
 import copy
@@ -101,7 +103,7 @@ class BaseRestHandler(admin.MConfigHandler):
                 self.get(self.callerArgs.id)
             except ResourceNotFound:
                 self.exist4sync = False
-            except Exception, exc:
+            except Exception as exc:
                 RH_Err.ctl(1102,
                            msgx='object=%s, err=%s' %
                                 (self.callerArgs.id, exc))
@@ -172,7 +174,7 @@ class BaseRestHandler(admin.MConfigHandler):
             arguments = set(itertools.chain(self.requiredArgs,
                                             self.optionalArgs,
                                             self.transientArgs))
-            extra_args = (arg for arg in self.callerArgs.data.keys()
+            extra_args = (arg for arg in list(self.callerArgs.data.keys())
                           if arg not in arguments)
             self._addArgs(optArgsIter=extra_args)
 
@@ -224,7 +226,7 @@ class BaseRestHandler(admin.MConfigHandler):
                 owner=user,
                 sessionKey=self.getSessionKey()
             )
-        except Exception, exc:
+        except Exception as exc:
             RH_Err.ctl(
                 1023,
                 msgx=exc,
@@ -236,7 +238,7 @@ class BaseRestHandler(admin.MConfigHandler):
         # read conf
         if self.callerArgs.id is None:
             ents = self.all()
-            for name, ent in ents.items():
+            for name, ent in list(ents.items()):
                 makeConfItem(name, ent, confInfo, user=user, app=app)
         else:
             try:
@@ -281,7 +283,7 @@ class BaseRestHandler(admin.MConfigHandler):
             ent['perms.read'] = perms.get("read", [])
             ent['perms.write'] = perms.get("write", [])
 
-            for k, v in self.callerArgs.data.items():
+            for k, v in list(self.callerArgs.data.items()):
                 ent[k] = v
 
             entity.setEntity(ent, self.getSessionKey(), uri=ent.id+'/acl')
@@ -338,7 +340,7 @@ class BaseRestHandler(admin.MConfigHandler):
         """
         # filter transient arguments & handle none value
         args = {key: '' if (val is None or val[0] is None) else val[0]
-                for key, val in args.iteritems()
+                for key, val in args.items()
                 if key not in self.transientArgs}
 
         # set default value if needed
@@ -358,10 +360,10 @@ class BaseRestHandler(admin.MConfigHandler):
         args = {k: ([(self.valMap[k].get(v) or v)
                      for v in (vs if isinstance(vs, list) else [vs])]
                     if k in self.valMap else vs)
-                for k, vs in args.items()}
+                for k, vs in list(args.items())}
         # Key Mapping
         args = {(k in self.keyMap and self.keyMap[k] or k): vs
-                for k, vs in args.items()}
+                for k, vs in list(args.items())}
 
         # encrypt
         tanzaName = self._makeStanzaName(self.callerArgs.id)
@@ -390,22 +392,22 @@ class BaseRestHandler(admin.MConfigHandler):
                            shouldPrint=False,
                            shouldRaise=False)
         else:
-            ent = {key: val for key, val in ent.iteritems()
+            ent = {key: val for key, val in ent.items()
                    if key not in self.encryptedArgs}
 
         # Adverse Key Mapping
-        ent = {k: v for k, v in ent.iteritems()}
-        keyMapAdv = {v: k for k, v in self.keyMap.items()}
-        ent_new = {keyMapAdv[k]: vs for k, vs in ent.items() if k in keyMapAdv}
+        ent = {k: v for k, v in ent.items()}
+        keyMapAdv = {v: k for k, v in list(self.keyMap.items())}
+        ent_new = {keyMapAdv[k]: vs for k, vs in list(ent.items()) if k in keyMapAdv}
         ent.update(ent_new)
 
         # Adverse Value Mapping
-        valMapAdv = {k: {y: x for x, y in m.items()}
-                     for k, m in self.valMap.items()}
+        valMapAdv = {k: {y: x for x, y in list(m.items())}
+                     for k, m in list(self.valMap.items())}
         ent = {k: (([(valMapAdv[k].get(v) or v) for v in vs]
                     if isinstance(vs, list) else (valMapAdv[k].get(vs) or vs))
                    if k in valMapAdv else vs)
-               for k, vs in ent.items()}
+               for k, vs in list(ent.items())}
 
         # normalize
         ent = self.normalize(ent)
@@ -413,7 +415,7 @@ class BaseRestHandler(admin.MConfigHandler):
         # filter undesired arguments & handle none value
         return {k: ((str(v).lower() if isinstance(v, bool) else v)
                     if (v is not None and str(v).strip()) else '')
-                for k, v in ent.iteritems()
+                for k, v in ent.items()
                 if k not in self.transientArgs and (
                     self.allowExtra or
                     k in self.requiredArgs or
@@ -423,12 +425,12 @@ class BaseRestHandler(admin.MConfigHandler):
 
     def _autoEncrypt(self, name, ent):
         cred_data = {key: ('' if val is None else val)
-                     for key, val in ent.iteritems()
+                     for key, val in ent.items()
                      if key in self.encryptedArgs and
                      val != CredMgmt.PASSWORD_MASK}
         if cred_data:
             ent = self._cred_mgmt.encrypt(self._makeStanzaName(name), ent)
-            args = {key: val for key, val in ent.iteritems()
+            args = {key: val for key, val in ent.items()
                     if key in self.encryptedArgs}
             self.update(name, **args)
         return ent
@@ -496,7 +498,7 @@ class BaseRestHandler(admin.MConfigHandler):
                                   sort_key=self.sortByKey,
                                   sort_dir=sort_dir,
                                   offset=self.posOffset)
-        return {name: self.decode(name, ent) for name, ent in ents.items()}
+        return {name: self.decode(name, ent) for name, ent in list(ents.items())}
 
     def get(self, name):
         user, app = self.user_app()
@@ -516,7 +518,7 @@ class BaseRestHandler(admin.MConfigHandler):
 
         try:
             new["name"] = name
-            for arg, val in params.items():
+            for arg, val in list(params.items()):
                 new[arg] = val
             entity.setEntity(new, sessionKey=self.getSessionKey())
         except Exception as exc:
@@ -539,7 +541,7 @@ class BaseRestHandler(admin.MConfigHandler):
                                    owner=user,
                                    sessionKey=self.getSessionKey())
 
-            for arg, val in params.items():
+            for arg, val in list(params.items()):
                 ent[arg] = val
 
             entity.setEntity(ent, sessionKey=self.getSessionKey())
@@ -548,7 +550,7 @@ class BaseRestHandler(admin.MConfigHandler):
 
     def getCallerArgs(self):
         callargs = dict()
-        for n, v in self.callerArgs.data.items():
+        for n, v in list(self.callerArgs.data.items()):
             callargs.update({n: v[0]})
         return callargs
 
@@ -657,7 +659,7 @@ class BaseModel(object):
     def normalize(self, data):
         """Normalize request arguments or response data.
         """
-        for k, vs in data.iteritems():
+        for k, vs in data.items():
             if k not in self.normalisers or not vs:
                 continue
             data[k] = [self.normalisers[k].normalize(v, data) for v in vs] \
@@ -668,7 +670,7 @@ class BaseModel(object):
     def validate(self, data):
         """Validate request arguments.
         """
-        for f, vs in data.iteritems():
+        for f, vs in data.items():
             if f not in self.validators or not vs:
                 continue
             vs = [vs] if not isinstance(vs, list) else vs

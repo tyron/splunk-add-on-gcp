@@ -1,3 +1,4 @@
+from builtins import object
 from splunktalib.common import logger
 import splunktalib.common.xml_dom_parser as xdp
 import splunktalib.conf_manager.request as req

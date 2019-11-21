@@ -1,3 +1,4 @@
+from builtins import object
 import traceback
 
 import splunk_ta_gcp.legacy.common as gwc

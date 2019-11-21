@@ -2,10 +2,14 @@
 This module provides filter management.
 """
 
+import sys
+from builtins import str
+from builtins import object
 from splunktaucclib.ucc_server import UCCServerException
 from collections import Iterable
 import re
 
+basestring = str if sys.version_info[0] == 3 else basestring
 
 class FilterException(UCCServerException):
     pass
@@ -60,7 +64,7 @@ class FilterManager(object):
         if not isinstance(settings, dict):
             return
 
-        for item in settings.keys():
+        for item in list(settings.keys()):
             if filters[index] == '*' or item == filters[index]:
                 if index >= len(filters)-1:
                     del settings[item]

@@ -4,10 +4,14 @@ Validators for Splunk configuration.
 
 from __future__ import absolute_import
 
+import sys
+from builtins import str
+from builtins import object
 import re
 import json
 from inspect import isfunction
 
+basestring = str if sys.version_info[0] == 3 else basestring
 
 __all__ = [
     'Validator', 'ValidationError', 'AnyOf', 'AllOf', 'RequiresIf',
@@ -240,7 +244,10 @@ class Number(Validator):
         :param is_int: the value should be integer or not
         """
         def check(val):
-            return val is None or isinstance(val, (int, long, float))
+            try:
+                return val is None or isinstance(val, (int, long, float))
+            except NameError:
+                return val is None or isinstance(val, (int, float))
         assert check(min_val) and check(max_val), \
             '``min_val`` & ``max_val`` should be numbers'
 
@@ -249,7 +256,10 @@ class Number(Validator):
 
     def validate(self, value, data):
         try:
-            value = long(value) if self._is_int else float(value)
+            try:
+                value = long(value) if self._is_int else float(value)
+            except NameError:
+                value = int(value) if self._is_int else float(value)
         except ValueError:
             self.put_msg(
                 'Invalid format for %s value'
@@ -288,7 +298,10 @@ class String(Validator):
         """
 
         def check(val):
-            return val is None or (isinstance(val, (int, long)) and val >= 0)
+            try:
+                return val is None or (isinstance(val, (int, long)) and val >= 0)
+            except NameError:
+                return val is None or (isinstance(val, int) and val >= 0)
         assert check(min_len) and check(max_len), \
             '``min_len`` & ``max_len`` should be non-negative integers'
 
@@ -333,7 +346,7 @@ class Datetime(Validator):
         import datetime
         try:
             datetime.datetime.strptime(value, self._format)
-        except ValueError, exc:
+        except ValueError as exc:
             self.put_msg(str(exc))
             return False
         return True

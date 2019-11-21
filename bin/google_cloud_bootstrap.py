@@ -1,14 +1,30 @@
 """
 This module is used to filter and reload PATH.
 """
-
 import os
+import sys
+try :
+    if os.name == 'nt' and sys.version_info[0] > 2:
+        # for Windows and python3 only
+        PYTHON = 'Python'
+        default_path = [path for path in sys.path if PYTHON in path]
+        default_path.extend(sys.path)
+        sys.path = default_path
+    import http
+    import queue
+    import copyreg
+    import re
+    import html
+    import configparser
+    import http.client
+except:
+    pass
+
 import os.path
 import re
-import sys
 import types
 import logging
-
+import httplib2_helper
 
 def setup_python_path():
     # Exclude folder beneath other apps, Fix bug for rest_handler.py
@@ -61,9 +77,6 @@ def run_rest_handler(name):
     logging.root.addHandler(logging.NullHandler())
     run_module(name)
 
-# We have to create virtual packages for google library again on Windows
-# Because the global state would not be inherited 
-if os.name == 'nt':
-    setup_python_path()
+setup_python_path()
 
 

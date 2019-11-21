@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import argparse
 from collections import deque
 import random
@@ -40,7 +42,7 @@ def _build_scheme(title, use_single_instance, **kwargs):
     scheme.use_external_validation = True
     scheme.streaming_mode = Scheme.streaming_mode_xml
     scheme.use_single_instance = use_single_instance
-    for name, options in kwargs.pop('arguments', {}).items():
+    for name, options in list(kwargs.pop('arguments', {}).items()):
         description = options.pop('description', None)
         validation = options.pop('validation', None)
         data_type = options.pop('data_type', Argument.data_type_string)
@@ -58,6 +60,7 @@ def _build_scheme(title, use_single_instance, **kwargs):
 
 def _render_scheme(stream, scheme):
     data = ET.tostring(scheme.to_xml())
+    data = data.decode('utf-8')
     stream.write(data)
     stream.flush()
     return 0

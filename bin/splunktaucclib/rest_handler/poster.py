@@ -1,7 +1,10 @@
 
 from __future__ import absolute_import
 
-import urllib
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import urllib.parse
 from httplib2 import Http
 import json
 import re
@@ -73,7 +76,7 @@ class PosterHandler(base.BaseRestHandler):
                            msgx='Unsupported method to be posted')
 
             payload = {key: val[0] for key, val
-                       in self.callerArgs.data.iteritems()
+                       in self.callerArgs.data.items()
                        if key in self.retransmittedArgs}
             headers = {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -82,15 +85,15 @@ class PosterHandler(base.BaseRestHandler):
             resp, content = http.request(url,
                                          method=method,
                                          headers=headers,
-                                         body=urllib.urlencode(payload))
+                                         body=urllib.parse.urlencode(payload))
             content = json.loads(content)
             if resp.status not in (200, 201, '200', '201'):
                 RH_Err.ctl(resp.status,
                            msgx=content)
 
-            for key, val in content.iteritems():
+            for key, val in content.items():
                 confInfo[self.callerArgs.id][key] = val
-        except Exception, exc:
+        except Exception as exc:
             RH_Err.ctl(1104, msgx=exc)
 
 

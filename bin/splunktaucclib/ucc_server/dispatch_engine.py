@@ -2,14 +2,19 @@
 This module provides dispatch engine object to dispatch settings.
 """
 
-import os
-import urllib
+
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import os, sys
+import urllib.parse
 import json
 import traceback
 from multiprocessing import cpu_count
 from copy import deepcopy
 from concurrent import futures
-from Queue import heapq
+
+import heapq
 
 import splunktalib.rest as sr
 import splunktalib.splunk_platform as ssp
@@ -21,6 +26,7 @@ from splunktaucclib.common import log
 from splunktaucclib.ucc_server import UCCServerException
 from splunktaucclib.common.rwlock import RWLock
 
+cmp = lambda x, y: (x > y) - (x < y)
 
 class DispatchEngineException(UCCServerException):
     """
@@ -177,7 +183,7 @@ class DispatchEngine(object):
                                                       app_name,
                                                       endpoint)
         if resource:
-            url = "{}/{}".format(url, urllib.quote(resource, ""))
+            url = "{}/{}".format(url, urllib.parse.quote(resource, ""))
         if do_sync:
             url = "{}/_sync".format(url)
 
@@ -203,7 +209,7 @@ class DispatchEngine(object):
         forwarder_schema = self._dispatch_schema_manager.get_forwarder_schema()
         forwarders = {forwarder_name: forwarder_setting for
                       forwarder_name, forwarder_setting in
-                      self._settings[forwarder_schema].iteritems()}
+                      self._settings[forwarder_schema].items()}
 
         # Update available forwarders and forwarders dispatch map
         with self._forwarders_lock.writer_lock:
@@ -212,7 +218,7 @@ class DispatchEngine(object):
                     forwarder,
                     self._dispatch_snapshot_manager.get_forwarder_load(
                         forwarder)) for
-                forwarder, forwarder_setting in forwarders.iteritems()
+                forwarder, forwarder_setting in forwarders.items()
                 if not self._dispatch_schema_manager.forwarder_is_disabled(
                     forwarder_setting)]
 
@@ -226,14 +232,14 @@ class DispatchEngine(object):
             # Forwarders new to reset
             forwarders_reset_new = {forwarder_name: forwarder_setting for
                                     forwarder_name, forwarder_setting in
-                                    forwarders.iteritems()
+                                    forwarders.items()
                                     if forwarder_name
                                     not in self._forwarders_snapshot}
 
             # Forwarders exist to reset
             forwarders_reset_exist = {forwarder_name: forwarder_setting for
                                       forwarder_name, forwarder_setting in
-                                      forwarders.iteritems()
+                                      forwarders.items()
                                       if forwarder_name
                                       in self._forwarders_snapshot and
                                       self._dispatch_schema_manager.
@@ -242,11 +248,11 @@ class DispatchEngine(object):
             # Forwarders delete to reset
             forwarders_reset_delete = {forwarder_name: forwarder_setting for
                                        forwarder_name, forwarder_setting in
-                                       self._forwarders_snapshot.iteritems()
+                                       self._forwarders_snapshot.items()
                                        if forwarder_name not in forwarders}
 
             # Update forwarder snapshot
-            for forwarder_name, forwarder_setting in forwarders.iteritems():
+            for forwarder_name, forwarder_setting in forwarders.items():
                 if forwarder_name in self._forwarders_snapshot:
                     self._forwarders_snapshot[forwarder_name] = \
                         deepcopy(forwarder_setting)
@@ -261,7 +267,7 @@ class DispatchEngine(object):
                                 traceback.format_exc(e))
         handle_futures = []
         for forwarder_name, forwarder_setting in \
-                forwarders_reset_new.iteritems():
+                forwarders_reset_new.items():
             handle_futures.append(
                 self._threadpool_executor.submit(self._reset_forwarder,
                                                  forwarder_name,
@@ -269,7 +275,7 @@ class DispatchEngine(object):
                                                  self.FORWARDER_NEW))
 
         for forwarder_name, forwarder_setting in \
-                forwarders_reset_exist.iteritems():
+                forwarders_reset_exist.items():
             handle_futures.append(
                 self._threadpool_executor.submit(self._reset_forwarder,
                                                  forwarder_name,
@@ -277,7 +283,7 @@ class DispatchEngine(object):
                                                  self.FORWARDER_EXIST))
 
         for forwarder_name, forwarder_setting in \
-                forwarders_reset_delete.iteritems():
+                forwarders_reset_delete.items():
             handle_futures.append(
                 self._threadpool_executor.submit(self._reset_forwarder,
                                                  forwarder_name,
@@ -406,7 +412,7 @@ class DispatchEngine(object):
         for global_setting_schema in \
                 self._dispatch_schema_manager.get_global_setting_schemas():
             for global_setting_name in \
-                    self._settings[global_setting_schema].keys():
+                    list(self._settings[global_setting_schema].keys()):
                 global_settings.add(DispatchSnapshotManager.combined_name(
                     global_setting_schema,
                     global_setting_name))
@@ -599,7 +605,7 @@ class DispatchEngine(object):
         inputs_snapshot = self._dispatch_snapshot_manager.get_inputs()
         inputs = set()
         for input_schema in self._dispatch_schema_manager.get_input_schemas():
-            for input_name in self._settings[input_schema].keys():
+            for input_name in list(self._settings[input_schema].keys()):
                 inputs.add(DispatchSnapshotManager.combined_name(input_schema,
                                                                  input_name))
 
@@ -953,9 +959,11 @@ class DispatchEngine(object):
         assert isinstance(setting, dict), \
             ValueError("Invalid setting, should be a dict.")
 
-        return {key: unicode.encode(value, "utf-8") if
-                isinstance(value, unicode) else json.dumps(value) for
-                key, value in setting.iteritems()}
+        str_type = unicode if sys.version_info[0] < 3 else str
+
+        return {key: str_type.encode(value, "utf-8") if 
+                isinstance(value, str_type) else json.dumps(value) for 
+                key, value in setting.items()}
 
     def dispatch_settings(self, settings):
         """

@@ -6,11 +6,13 @@ It will return endpoints that failed to be cleaned.
 
 from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
 import json
 import logging
 from inspect import ismethod
 from itertools import chain as iter_chain
-from urllib import quote
+from urllib.parse import quote
 
 from splunk import admin, rest
 

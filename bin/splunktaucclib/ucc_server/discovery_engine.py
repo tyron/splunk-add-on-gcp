@@ -2,6 +2,7 @@
 This module provides discovery engine object to divide settings.
 """
 
+from builtins import object
 import traceback
 import re
 
@@ -55,7 +56,7 @@ class DiscoveryEngine(object):
                 self._division_schema_manager.get_ordered_schemas():
             value1 = settings[name1]
             value1_copy = deepcopy(value1)
-            for name2, value2 in value1.items():
+            for name2, value2 in list(value1.items()):
                 if not name2 == self.SOURCE_MAPPING:
                     assert name3 in value2, \
                         DiscoveryEngineException(
@@ -100,7 +101,7 @@ class DiscoveryEngine(object):
                 value1_copy = deepcopy(value1)
                 refer_value = settings[refer]
 
-                for name2, value2 in value1.items():
+                for name2, value2 in list(value1.items()):
                     if not name2 == self.SOURCE_MAPPING:
                         value3 = value2[name3]
                         if value3 not in refer_value:
@@ -141,13 +142,13 @@ class DiscoveryEngine(object):
             get_ordered_refer_schemas()
         for name1, name3, refer in refer_schemas:
             value1 = settings[refer]
-            for name2, value2 in deepcopy(value1).items():
+            for name2, value2 in list(deepcopy(value1).items()):
                 if not name2.startswith(self._ucc_server_id):
                     del value1[name2]
                     value1[self._ucc_server_id + "_" + name2] = value2
 
             value1 = settings[name1]
-            for name2, value2 in deepcopy(value1).items():
+            for name2, value2 in list(deepcopy(value1).items()):
                 if not value2[name3].startswith(self._ucc_server_id):
                     value2[name3] = self._ucc_server_id + "_" + value2[name3]
 
@@ -159,7 +160,7 @@ class DiscoveryEngine(object):
         for name1, pattern, replace in self._division_schema_manager.\
                 get_renaming_schemas():
             value1 = settings[name1]
-            for name2, value2 in deepcopy(value1).items():
+            for name2, value2 in list(deepcopy(value1).items()):
                 del value1[name2]
                 new_name = re.compile(pattern).sub(replace, name2)
                 value1[new_name] = value2

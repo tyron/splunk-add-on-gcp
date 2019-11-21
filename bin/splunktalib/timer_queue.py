@@ -2,8 +2,11 @@
 A timer queue implementation
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import threading
-import Queue
+import queue
 from time import time
 import traceback
 
@@ -22,7 +25,7 @@ class TimerQueue(object):
         self._timers = TimerQueue.sc.SortedSet()
         self._cancelling_timers = {}
         self._lock = threading.Lock()
-        self._wakeup_queue = Queue.Queue()
+        self._wakeup_queue = queue.Queue()
         self._thr = threading.Thread(target=self._check_and_execute)
         self._thr.daemon = True
         self._started = False
@@ -97,7 +100,7 @@ class TimerQueue(object):
                 wakeup = wakeup_queue.get(timeout=sleep_time)
                 if wakeup is None:
                     break
-            except Queue.Empty:
+            except queue.Empty:
                 pass
         logger.info("TimerQueue stopped.")
 

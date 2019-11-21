@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from six import string_types
 import os
 import os.path
 import binascii
@@ -69,6 +72,17 @@ class Partition(object):
         for key in self._raw_keys():
             yield self._strip(key)
 
+    def find(self, key):
+        key = self._decor(key)
+        item = self._store.find(key)
+        if item:
+            key = self._strip(item.key)
+            return Item(key, item.value)
+        return None
+
+    def sweep(self):
+        return self._store.sweep()
+
 
 class LocalKVStore(object):
     MAGIC = 'BUK0'
@@ -82,7 +96,7 @@ class LocalKVStore(object):
         fp.seek(0, os.SEEK_SET)
 
         magic = fp.read(4)
-        if magic != 'BUK0':
+        if magic != b'BUK0': # added b for python 2  and 3 compatability as recieving in bytes in python3
             raise BucketFileError('magic mismatch', 0)
         while True:
             position = fp.tell()
@@ -96,7 +110,7 @@ class LocalKVStore(object):
                 raise BucketFileError('data corrupted', position)
             else:
                 yield flag, key, position
-        raise StopIteration()
+        # raise StopIteration() # causes exception in python3
 
     @classmethod
     def _flush(cls, fp):
@@ -116,7 +130,8 @@ class LocalKVStore(object):
     def _truncate(cls, fp, size):
         if size == 0:
             fp.truncate(0)
-            fp.write(cls.MAGIC)
+            MAGIC = (cls.MAGIC).encode('utf-8')
+            fp.write(MAGIC)
         else:
             fp.truncate(size)
             fp.seek(0, 2)
@@ -152,8 +167,12 @@ class LocalKVStore(object):
 
     @classmethod
     def open_always(cls, filename):
-        fp = open(filename, 'a+b')
-        indexes = cls.build_indexes(fp)
+        try:
+            fp = open(filename, 'a+b')
+            indexes = cls.build_indexes(fp)
+        except Exception as e:
+            logger.error("Open checkpoint failed. {exception}".format(exception=str(e)), path=filename)
+            exit()
         return cls(indexes, fp)
 
     @classmethod
@@ -173,8 +192,9 @@ class LocalKVStore(object):
 
     @classmethod
     def nearest_greater_prefix(cls, prefix):
+        prefix = prefix.encode('utf-8')
         hexstr = binascii.b2a_hex(prefix)
-        hexnum = long(hexstr, 16)
+        hexnum = int(hexstr, 16)
         hexnum += 1
         hexstr = hex(hexnum)
         hexstr = hexstr[2:]
@@ -238,8 +258,12 @@ class LocalKVStore(object):
         self._indexes = indexes
         self._next_write_pos = fp.tell()
 
+    def convert(self, value):
+        import sys
+        return (value.decode('utf-8') if sys.version_info < (3,) else value)
+
     def set(self, key, value, **kwargs):
-        assert isinstance(key, (str, unicode))
+        assert isinstance(key, (str, str))
         pos = self._write(self.OP_SET, key, value, **kwargs)
         self._indexes[key] = pos
 
@@ -263,6 +287,7 @@ class LocalKVStore(object):
             del self._indexes[key]
 
     def range(self, minimum=None, maximal=None, policy=(True, True), reverse=False):
+        maximal = maximal.decode('utf-8')
         return self._indexes.irange(minimum, maximal, policy, reverse)
 
     def prefix(self, prefix, reverse=False):
@@ -287,25 +312,25 @@ class LocalKVStore(object):
 
 
 if __name__ == '__main__':
-    print 'Convert binary checkpoint file to json file...'
+    print('Convert binary checkpoint file to json file...')
     import sys
     import json
     if len(sys.argv) != 2:
-        print 'Usage: \n\t' \
+        print('Usage: \n\t' \
               '$SPLUNK_HOME/etc/apps/Splunk_TA_aws/bin/' \
               'splunksdc/checkpoint.py ' \
-              '<file name of binary checkpoint>'
+              '<file name of binary checkpoint>')
         sys.exit(0)
 
 
     def dump_data(data):
         import collections
-        if isinstance(data, (basestring, int, long, float, bool)):
+        if isinstance(data, (string_types, int, float, bool)):
             return data
         elif isinstance(data, collections.Mapping):
-            return dict(map(dump_data, data.iteritems()))
+            return dict(list(map(dump_data, iter(data.items()))))
         elif isinstance(data, collections.Iterable):
-            return map(dump_data, data)
+            return list(map(dump_data, data))
         else:
             return str(data)
 
@@ -315,4 +340,4 @@ if __name__ == '__main__':
     output_file = sys.argv[1] + '.json'
     with open(output_file, 'w') as f:
         f.write(json.dumps(cont, sort_keys=True))
-    print 'Output into file: %s' % output_file
+    print('Output into file: %s' % output_file)

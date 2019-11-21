@@ -1,3 +1,4 @@
+from six import string_types
 import json
 import time
 import copy
@@ -179,7 +180,7 @@ class BooleanField(Field):
 
     def parse(self, document):
         value = super(BooleanField, self).parse(document)
-        if isinstance(value, basestring):
+        if isinstance(value, string_types):
             value = value.lower()
             value = value in ['yes', 'on', 'true', 'ok', '1']
         else:

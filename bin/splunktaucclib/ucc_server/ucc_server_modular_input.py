@@ -1,6 +1,7 @@
 """
 Splunk TA ucc server program template.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -38,7 +39,7 @@ def do_scheme(ucc_setting):
     Feed splunkd the TA's scheme.
     """
 
-    print """
+    print("""
     <scheme>
       <title>{title}</title>
       <description>{description}</description>
@@ -58,7 +59,7 @@ def do_scheme(ucc_setting):
         </args>
       </endpoint>
     </scheme>
-    """.format(title=ucc_setting["title"], description=ucc_setting["description"])
+    """.format(title=ucc_setting["title"], description=ucc_setting["description"]))
 
 
 def _setup_signal(ucc_server, ucc_setting):

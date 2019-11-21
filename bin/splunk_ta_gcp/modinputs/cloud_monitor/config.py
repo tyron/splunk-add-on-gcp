@@ -1,7 +1,12 @@
 import splunk_ta_gcp.legacy.config as gconf
 import splunk_ta_gcp.legacy.consts as ggc
-from . import consts as gmc
-from . import wrapper as gmw
+try :
+    from . import consts as gmc
+    from . import wrapper as gmw
+except ImportError:
+    import consts as gmc
+    import wrapper as gmw
+
 
 
 class GoogleCloudMonitorConfig(gconf.GoogleConfig):

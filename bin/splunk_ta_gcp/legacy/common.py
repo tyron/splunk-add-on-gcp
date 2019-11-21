@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 import sys
 import os
 import time
@@ -37,7 +39,7 @@ def usage():
     """
 
     hlp = "%s --scheme|--validate-arguments|-h"
-    print >> sys.stderr, hlp % sys.argv[0]
+    print(hlp % sys.argv[0], file=sys.stderr)
     sys.exit(1)
 
 
@@ -46,7 +48,7 @@ def print_scheme(title, description):
     Feed splunkd the TA's scheme
     """
 
-    print """
+    print("""
     <scheme>
     <title>{title}</title>
     <description>{description}</description>
@@ -63,7 +65,7 @@ def print_scheme(title, description):
         </arg>
       </args>
     </endpoint>
-    </scheme>""".format(title=title, description=description)
+    </scheme>""".format(title=title, description=description))
 
 
 def main(scheme_printer, run):

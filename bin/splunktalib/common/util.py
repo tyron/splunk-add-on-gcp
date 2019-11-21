@@ -2,6 +2,10 @@
 Copyright (C) 2005-2015 Splunk Inc. All Rights Reserved.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
 import datetime
 import gc
 import itertools
@@ -10,7 +14,7 @@ import os.path as op
 import re
 import sys
 import threading
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import xml.sax.saxutils as xss
 from contextlib import contextmanager
 from functools import wraps
@@ -73,7 +77,10 @@ def get_appname_from_path(absolute_path):
 
 
 def escape_cdata(data):
-    data = data.encode("utf-8", errors="xmlcharrefreplace")
+    if sys.version_info[0] < 3 :
+        data = data.encode("utf-8", errors="xmlcharrefreplace")
+    else :
+        data = data.encode("utf-8", errors="xmlcharrefreplace").decode("utf-8")
     data = xss.escape(data)
     return data
 
@@ -131,7 +138,7 @@ def disable_stdout_buffer():
 
 
 def format_stanza_name(name):
-    return urllib.quote(name.encode("utf-8"), "")
+    return urllib.parse.quote(name.encode("utf-8"), "")
 
 
 def extract_hostname_port(uri):
@@ -155,6 +162,6 @@ def extract_hostname_port(uri):
 def save_and_restore(stanza, keys, exceptions=()):
     vals = [stanza.get(key) for key in keys]
     yield
-    for key, val in itertools.izip(keys, vals):
+    for key, val in zip(keys, vals):
         if (key, val) not in exceptions:
             stanza[key] = val
