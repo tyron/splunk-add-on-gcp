@@ -1,4 +1,7 @@
-import urlparse
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import urllib.parse
 from splunksdc import log as logging
 from splunksdc import environ
 from splunklib.client import Service
@@ -15,7 +18,7 @@ class Stanza(object):
         self.content = content
         self.content = {
             key: value.strip()
-            for key, value in self.content.items()
+            for key, value in list(self.content.items())
             if value is not None
         }
 
@@ -24,7 +27,7 @@ class Context(object):
     @classmethod
     def from_url(cls, server_uri, stanza):
 
-        parts = urlparse.urlparse(server_uri)
+        parts = urllib.parse.urlparse(server_uri)
         scheme = parts.scheme
         host = parts.hostname
         port = parts.port
@@ -63,7 +66,7 @@ class Context(object):
         definition = InputDefinition.parse(stream)
 
         metadata = definition.metadata
-        parts = urlparse.urlparse(metadata['server_uri'])
+        parts = urllib.parse.urlparse(metadata['server_uri'])
         scheme = parts.scheme
         host = parts.hostname
         port = parts.port
@@ -76,7 +79,7 @@ class Context(object):
         log_dir = environ.get_log_folder()
 
         inputs = list()
-        for name, params in definition.inputs.items():
+        for name, params in list(definition.inputs.items()):
             kind, name = cls._split_stanza(name)
             stanza = Stanza(kind, name, params)
             inputs.append(stanza)

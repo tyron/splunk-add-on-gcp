@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import
 
+from builtins import object
 import json
 
 import splunk
@@ -65,7 +66,7 @@ class CredMgmt(object):
         :return:
         """
         cred_data_new = {key: ('' if val is None else val)
-                         for key, val in data.iteritems()
+                         for key, val in data.items()
                          if key in self._encryptedArgs and
                          val != CredMgmt.PASSWORD_MASK}
         if not cred_data_new:
@@ -89,7 +90,7 @@ class CredMgmt(object):
             for arg in data:
                 if arg in self._encryptedArgs:
                     data[arg] = CredMgmt.PASSWORD_MASK
-        except Exception, exc:
+        except Exception as exc:
             RestHandlerError.ctl(1020,
                                  msgx=exc,
                                  shouldPrint=False,
@@ -116,14 +117,14 @@ class CredMgmt(object):
 
         try:
             creds = cred_mgr.get_clear_password(username)
-        except Exception, exc:
+        except Exception as exc:
             RestHandlerError.ctl(1021,
                                  msgx=exc,
                                  shouldPrint=True,
                                  shouldRaise=True)
         cred = creds.get(username, {})
 
-        for arg, val in cred.items():
+        for arg, val in list(cred.items()):
             data[arg] = (val if arg in self._encryptedArgs else data[arg])
         return data
 
@@ -145,7 +146,7 @@ class CredMgmt(object):
                            realm=realm)
         try:
             cred_mgr.delete(username, throw=True)
-        except Exception, exc:
+        except Exception as exc:
             RestHandlerError.ctl(1022,
                                  msgx=exc,
                                  shouldPrint=False,

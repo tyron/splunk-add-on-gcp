@@ -2,6 +2,7 @@
 The loop object responses for firing events and watching signals.
 Currently, only watching signals is implemented. The name may change in future.
 """
+from builtins import object
 import os
 import signal
 import multiprocessing

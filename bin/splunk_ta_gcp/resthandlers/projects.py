@@ -1,3 +1,4 @@
+from __future__ import print_function
 import logging
 import googleapiclient
 import splunk.clilib.cli_common as scc
@@ -43,7 +44,7 @@ class GoogleProjects(admin.MConfigHandler):
             else:
                 raise e
         except Exception as e:
-            print e
+            print(e)
             raise BaseException()
         conf_info["google_projects"].append("projects", projects)
         logger.info("end of listing google projects")

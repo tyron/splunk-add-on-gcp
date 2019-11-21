@@ -1,3 +1,4 @@
+from builtins import object
 import time
 
 import splunktalib.file_monitor as fm

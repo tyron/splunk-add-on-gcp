@@ -1,3 +1,7 @@
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
 import os.path as op
 import os
 import json
@@ -130,7 +134,7 @@ class FileStateStore(BaseStateStore):
         :return: None if successful, otherwise throws exception
         """
 
-        fname = op.join(self._meta_configs["checkpoint_dir"], key)
+        fname = op.join(self._meta_configs["checkpoint_dir"], key.decode("utf-8"))
         with open(fname + ".new", "w") as jsonfile:
             json.dump(state, jsonfile)
             jsonfile.flush()
@@ -148,7 +152,7 @@ class FileStateStore(BaseStateStore):
             self.update_state(state["_key"], state["value"])
 
     def get_state(self, key):
-        fname = op.join(self._meta_configs["checkpoint_dir"], key)
+        fname = op.join(self._meta_configs["checkpoint_dir"], key.decode('UTF-8'))
         if op.exists(fname):
             try:
                 with open(fname) as jsonfile:
@@ -192,11 +196,11 @@ if __name__ == "__main__":
 
     def _update_ckpt():
         store = get_state_store(config, appname, collection, True)
-        for i in xrange(10000):
+        for i in range(10000):
             mystate["x"] = str(i)
             store.update_state(key, mystate)
             time.sleep(1)
-        print "done"
+        print("done")
 
     for i in range(num):
         pool.enqueue_funcs((_update_ckpt,))

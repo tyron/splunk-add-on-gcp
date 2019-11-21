@@ -1,3 +1,4 @@
+from builtins import object
 import os
 from splunksdc import log as logging
 
@@ -73,7 +74,7 @@ class LogExceptions(object):
 
 class LogWith(object):
     def __init__(self, **kwargs):
-        self._pairs = kwargs.items()
+        self._pairs = list(kwargs.items())
 
     def __call__(self, func):
         pairs = self._pairs

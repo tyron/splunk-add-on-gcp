@@ -1,9 +1,9 @@
-remote_pdb.py,sha256=kmkwjzLd0FOboUq7B74-2HQFKWZU7E73sXyoDc7qlHM,3865
 remote_pdb-1.2.0.dist-info/DESCRIPTION.rst,sha256=Smdjae09xXym1Ks6TsZTer9n6CJK1F6HapaRSByPp38,4290
+remote_pdb-1.2.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
 remote_pdb-1.2.0.dist-info/METADATA,sha256=hcgblL6qMUPwgBOabsoxpx1HRjIdVrVeloIHv2F7aWo,5344
 remote_pdb-1.2.0.dist-info/RECORD,,
 remote_pdb-1.2.0.dist-info/WHEEL,sha256=GrqQvamwgBV4nLoJe0vhYRSWzWsx7xjlt74FT0SWYfE,110
 remote_pdb-1.2.0.dist-info/entry_points.txt,sha256=eqGnTHtEVMYwfXVk1Z9MhC8O2N8wuqAbr0lisLmrkxs,20
 remote_pdb-1.2.0.dist-info/metadata.json,sha256=yIo_dz5DZXw9ErsRwcFyXl8n-TLK-c1n6MOS0rxWWqE,1239
 remote_pdb-1.2.0.dist-info/top_level.txt,sha256=KvKbi-ysKmhoiX5F8SJhmyCt5ehvvAVGGxN-Kd5uouc,11
-remote_pdb-1.2.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+remote_pdb.py,sha256=kmkwjzLd0FOboUq7B74-2HQFKWZU7E73sXyoDc7qlHM,3865

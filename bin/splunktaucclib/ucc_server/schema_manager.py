@@ -2,9 +2,11 @@
 This module provides various schema management.
 """
 
+from builtins import object
 import json
 from splunktaucclib.ucc_server import UCCServerException
 
+cmp = lambda x, y: (x > y) - (x < y)
 
 class SchemaManagerException(UCCServerException):
     """
@@ -211,9 +213,9 @@ class DivisionSchemaManager(SchemaManager):
 
         # Extract schemas
         tmp = []
-        for name1, value1 in division_schema.iteritems():
+        for name1, value1 in division_schema.items():
             if isinstance(value1, dict):
-                for name3, value3 in value1.iteritems():
+                for name3, value3 in value1.items():
                     if name3 == "_renaming":
                         try:
                             assert self.TYPE in value3 and \
@@ -276,7 +278,7 @@ class DivisionSchemaManager(SchemaManager):
                 settings)
             for schema in self._ordered_schemas:
                 assert schema.name1 in settings
-                for _, value2 in settings[schema.name1].iteritems():
+                for _, value2 in settings[schema.name1].items():
                     assert schema.name3 in value2
         except Exception as e:
             raise SchemaManagerException(e)
@@ -376,7 +378,7 @@ class DispatchSchemaManager(SchemaManager):
         self._global_setting_schemas = set()
         self._input_schemas = set()
         tmp = []
-        for key, value in dispatch_schema.iteritems():
+        for key, value in dispatch_schema.items():
             if isinstance(value, dict):
                 assert self.ROLE in value, \
                     SchemaManagerException(
@@ -475,7 +477,7 @@ class DispatchSchemaManager(SchemaManager):
             valid_schemas = set.union(self._global_setting_schemas,
                                       self._input_schemas)
             valid_schemas.add(self._forwarder_schema)
-            for schema in settings.keys():
+            for schema in list(settings.keys()):
                 assert schema in valid_schemas if \
                     not schema.startswith("_") else True
         except Exception as e:

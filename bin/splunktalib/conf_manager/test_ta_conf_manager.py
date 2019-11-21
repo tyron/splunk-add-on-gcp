@@ -1,3 +1,5 @@
+from future import standard_library
+standard_library.install_aliases()
 import sys
 import unittest as ut
 
@@ -9,15 +11,15 @@ import splunktalib.credentials as cred
 
 
 import xml.etree.ElementTree as ET
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 
 def login(host="https://localhost:8089/", username='admin',
           password='changeme', ):
     data = {'username': username, 'password': password}
-    data = urllib.urlencode(data)
-    f = urllib2.urlopen(host + "/services/auth/login", data)
+    data = urllib.parse.urlencode(data)
+    f = urllib.request.urlopen(host + "/services/auth/login", data)
     session_key = ET.parse(f).find('sessionKey').text
     return session_key
 
@@ -51,24 +53,24 @@ class TestConfManager(ut.TestCase):
         res = mgr.create(data)
         self.assertIsNone(res)
         res = mgr.get(data["name"])
-        for key, val in data.iteritems():
+        for key, val in data.items():
             self.assertEqual(val, res[key])
 
         data["username"] = "admin2"
         mgr.update(data)
         res = mgr.get(data["name"])
-        for key, val in data.iteritems():
+        for key, val in data.items():
             self.assertEqual(val, res[key])
 
         res = mgr.create(data2)
         self.assertIsNone(res)
         results = mgr.all(return_acl=False)
-        for key, stanza in results.iteritems():
+        for key, stanza in results.items():
             if key == data["name"]:
-                for key, val in data.iteritems():
+                for key, val in data.items():
                     self.assertEqual(val, stanza[key])
             elif key == data2["name"]:
-                for key, val in data2.iteritems():
+                for key, val in data2.items():
                     self.assertEqual(val, stanza[key])
             else:
                 self.assertTrue(False)
@@ -81,7 +83,7 @@ class TestConfManager(ut.TestCase):
         res = mgr.update(data)
         self.assertIsNone(res)
         res = mgr.get(data["name"])
-        for key, val in data.iteritems():
+        for key, val in data.items():
             self.assertEqual(val, res[key])
         res = mgr.delete(data["name"])
         self.assertIsNone(res)

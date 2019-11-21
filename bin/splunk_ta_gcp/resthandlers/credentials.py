@@ -1,3 +1,4 @@
+from six import string_types
 import json
 
 import splunk.admin as admin
@@ -59,7 +60,7 @@ class GoogleCredentialsHandler(base.BaseRestHandler):
             name, ent = ent['name'], ent['content']
             for field in endpoint['fields']:
                 val = ent.get(field)
-                if isinstance(val, basestring):
+                if isinstance(val, string_types):
                     val = [val]
                 if self.callerArgs.id in val:
                     RH_Err.ctl(
@@ -79,7 +80,7 @@ class GoogleCredentialsHandler(base.BaseRestHandler):
                     raise Exception(cont)
                 res = json.loads(cont)
                 self.check_entries(ep, res['entry'])
-        except Exception, exc:
+        except Exception as exc:
             RH_Err.ctl(1105, exc)
         super(GoogleCredentialsHandler, self).handleRemove(confInfo)
 

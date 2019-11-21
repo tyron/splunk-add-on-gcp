@@ -125,6 +125,10 @@ define([
             if (value === '.' || value === '..') {
                 return _(". and .. are not supported").t();
             }
+
+            if(!/^[a-zA-Z]\w*$/.test(value)){
+                return _('Field "Name" must begin with a letter and consist of alphanumeric characters and underscores.').t();
+            }
         },
 
         _getAttrLabel: function (attr) {

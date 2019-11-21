@@ -1,3 +1,4 @@
+from builtins import object
 import threading
 
 
@@ -52,6 +53,24 @@ class Timer(object):
 
     def __eq__(self, other):
         return isinstance(other, Timer) and (self.ident() == other.ident())
+    
+    def __lt__(self, other):
+        return self.__cmp__(other) == -1
+
+    def __gt__(self, other):
+        return self.__cmp__(other) == 1
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __le__(self, other):
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __ge__(self, other):
+        return self.__gt__(other) or self.__eq__(other)
+
+    def __hash__(self):
+        return self.ident()
 
     def __call__(self):
         self._callback()

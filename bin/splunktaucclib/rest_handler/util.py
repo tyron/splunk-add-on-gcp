@@ -1,12 +1,13 @@
 
 from __future__ import absolute_import
+from __future__ import print_function
 
 from splunk import admin
 
 try:
     from splunktalib.common import util
 except:
-    print 'Python Lib for Splunk add-on "splunktalib" is required'
+    print('Python Lib for Splunk add-on "splunktalib" is required')
     raise BaseException()
 
 
@@ -24,7 +25,7 @@ def getBaseAppName():
 
 def makeConfItem(name, entity, confInfo, user='nobody', app='-'):
     confItem = confInfo[name]
-    for key, val in entity.items():
+    for key, val in list(entity.items()):
         if key not in ("eai:attributes", "eai:userName", "eai:appName"):
             confItem[key] = val
     confItem["eai:userName"] = entity.get("eai:userName") or user

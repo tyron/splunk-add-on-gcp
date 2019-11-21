@@ -1,14 +1,21 @@
-import urllib
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from six import string_types
+from builtins import object
+import urllib.request, urllib.parse, urllib.error
 import json
 from traceback import format_exc
 import sys
 import os.path as op
+import httplib2_helper
 import httplib2shim
 from httplib2 import (socks, ProxyInfo, Http)
 
 import splunktalib.common.util as scu
 import splunktalib.common.pattern as scp
 from splunktalib.common import logger
+from future.utils import with_metaclass
 
 def splunkd_request(splunkd_uri, session_key, method="GET", headers=None,
                     data=None, timeout=30, retry=1, http=None):
@@ -73,15 +80,15 @@ def do_splunkd_request(splunkd_uri, session_key, method, headers,
         content_type = "application/x-www-form-urlencoded"
         headers["Content-Type"] = content_type
 
-    if data is not None and not isinstance(data, basestring):
+    if data is not None and not isinstance(data, string_types):
         if content_type == "application/json":
             data = json.dumps(data)
         else:
-            data = urllib.urlencode(data)
+            data = urllib.parse.urlencode(data)
 
     msg_temp = "Failed to send rest request=%s, errcode=%s, reason=%s"
     resp, content = None, None
-    for _ in xrange(retry):
+    for _ in range(retry):
         try:
             resp, content = http_req(splunkd_uri, method, headers,
                                      data, timeout)
@@ -174,9 +181,7 @@ def build_http_connection(config, timeout=120, disable_ssl_validation=False):
     return http
 
 
-class HttpPoolManager(object):
-
-    __metaclass__ = scp.SingletonMeta
+class HttpPoolManager(with_metaclass(scp.SingletonMeta, object)):
 
     import urllib3
     urllib3.disable_warnings()

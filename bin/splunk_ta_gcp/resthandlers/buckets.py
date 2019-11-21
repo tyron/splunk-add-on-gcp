@@ -54,7 +54,7 @@ class GoogleBuckets(admin.MConfigHandler):
         while request:
             try:
                 response = request.execute()
-            except googleapiclient.errors.HttpError, exc:
+            except googleapiclient.errors.HttpError as exc:
                 RH_Err.ctl(400, exc)
             names = [item.get('name') for item in response.get('items')]
             bucket_names.extend(names)

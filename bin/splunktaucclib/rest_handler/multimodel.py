@@ -11,6 +11,7 @@ This handler is for some global settings like proxy, logging, etc.
 
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 
 import splunk
@@ -112,7 +113,7 @@ class MultiModelRestHandler(base.BaseRestHandler):
                                           owner=user,
                                           sessionKey=self.getSessionKey())
 
-            for arg, val in params.items():
+            for arg, val in list(params.items()):
                 ent[arg] = val
             splunk.entity.setEntity(ent, sessionKey=self.getSessionKey())
         except splunk.ResourceNotFound:

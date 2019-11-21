@@ -1,4 +1,7 @@
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import urllib.parse
 from splunksdc import log as logging
 from splunksdc.config import StanzaParser
 from splunksdc.config import LogLevelField, StringField, BooleanField
@@ -40,7 +43,7 @@ class Settings(object):
         if not proxy.enabled:
             return ''
 
-        scheme = proxy.scheme.encode()
+        scheme = proxy.scheme
         if scheme not in ['http', 'socks5', 'socks5h', 'socks4', 'socks4a']:
             logger.warning('Proxy scheme is invalid', scheme=scheme)
             return ''
@@ -57,10 +60,10 @@ class Settings(object):
         )
         auth = None
         if proxy.username and len(proxy.username) > 0:
-            auth = urllib2.quote(proxy.username.encode(), safe='')
+            auth = urllib.parse.quote(proxy.username.encode(), safe='')
             if proxy.password and len(proxy.password) > 0:
                 auth += ':'
-                auth += urllib2.quote(proxy.password.encode(), safe='')
+                auth += urllib.parse.quote(proxy.password.encode(), safe='')
 
         if auth:
             endpoint = auth + '@' + endpoint

@@ -1,5 +1,9 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
 from collections import Iterable
-import Queue
+import queue
 import threading
 from splunksdc import log as logging
 from splunksdc.utils import LogWith
@@ -16,8 +20,8 @@ class BatchExecutorExit(object):
 class BatchExecutor(object):
     def __init__(self, **kwargs):
         self._number_of_worker = kwargs.pop('number_of_threads', _DEFAULT_MAX_NUMBER_OF_THREAD)
-        self._completed_queue = Queue.Queue(self._number_of_worker)
-        self._pending_queue = Queue.Queue()
+        self._completed_queue = queue.Queue(self._number_of_worker)
+        self._pending_queue = queue.Queue()
         self._stopped = threading.Event()
         self._main_context = logging.ThreadLocalLoggingStack.top()
 
@@ -61,7 +65,7 @@ class BatchExecutor(object):
                     job, result = self._completed_queue.get(timeout=3)
                     delegate.done(job, result)
                     number_of_pending -= 1
-                except Queue.Empty:
+                except queue.Empty:
                     pass
 
             if delegate.is_aborted():
@@ -85,7 +89,7 @@ class BatchExecutor(object):
                 job = self._pending_queue.get(timeout=3)
                 result = procedure(job, *args)
                 self._completed_queue.put((job, result))
-            except Queue.Empty:
+            except queue.Empty:
                 pass
         return
 

@@ -1,3 +1,4 @@
+from builtins import object
 import json
 from google.oauth2 import service_account
 

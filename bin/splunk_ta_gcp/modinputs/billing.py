@@ -1,11 +1,18 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import chr
+from builtins import zip
+from builtins import object
 import google_cloud_bootstrap
 import json
 import base64
 import tempfile
 import httplib2
 import httplib2shim
+import urllib3 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from httplib2shim import AuthorizedHttp
-from urlparse import urlparse, unquote
+from urllib.parse import urlparse, unquote
 from httplib2.socks import ProxyError, PROXY_TYPE_HTTP, PROXY_TYPE_SOCKS5, PROXY_TYPE_SOCKS4
 from googleapiclient.discovery import build as build_service_client
 from googleapiclient.http import MediaIoBaseDownload
@@ -46,7 +53,7 @@ class BillingDataInputs(object):
     def load(self):
         workspace = self._app.workspace()
         content = self._config.load('google_cloud_billing_inputs')
-        for name, fields in content.items():
+        for name, fields in list(content.items()):
             parser = StanzaParser([
                 BooleanField('disabled', default=False, reverse=True, rename='enabled'),
                 StringField('bucket_name', required=True),
@@ -165,6 +172,8 @@ class BillingReportsHandler(object):
             )
 
         page_token = self._make_page_token(last_file)
+        page_token = page_token.decode('utf-8')
+
         request = objects.list(
             bucket=bucket_name,
             prefix=prefix,
@@ -184,9 +193,9 @@ class BillingReportsHandler(object):
     @classmethod
     def _make_page_token(cls, key):
         """ assemble page token by key """
-        key = key.encode('utf-8')
+        # key = key.encode('utf-8')
         length = len(key)
-        token = '\x0a' + chr(length) + key
+        token = ('\x0a' + chr(length) + key).encode('utf-8')
         token = base64.b64encode(token)
         return token
 
@@ -249,7 +258,7 @@ class BillingReportsHandler(object):
                     head = line.split(',')
                     continue
                 line = line.split(',')
-                record = dict(zip(head, line))
+                record = dict(list(zip(head, line)))
                 yield json.dumps(record, sort_keys=True)
         return '\n'.join(_parse())
 

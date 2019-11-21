@@ -1,3 +1,5 @@
+from builtins import range
+from builtins import object
 import time
 from collections import Iterable
 from sortedcontainers import SortedSet
@@ -110,7 +112,7 @@ class TaskScheduler(object):
     def _find_finished_task(self):
         executor = self._executor
         tasks = set()
-        for task_id, worker in self._running_tasks.items():
+        for task_id, worker in list(self._running_tasks.items()):
             if worker.poll():
                 tasks.add(task_id)
                 executor.release(worker)

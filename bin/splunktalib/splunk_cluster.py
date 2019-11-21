@@ -1,3 +1,4 @@
+from builtins import object
 import splunktalib.rest as rest
 import splunktalib.common.xml_dom_parser as xdp
 

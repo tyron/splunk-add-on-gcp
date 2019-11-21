@@ -2,6 +2,7 @@
 This module hanles configuration related stuff
 """
 
+from builtins import object
 import os.path as op
 
 from splunktalib.common import logger
@@ -207,7 +208,7 @@ class ConfManager(object):
     def _delete_metadata(self, stanzas, ret_metadata):
         if stanzas and not ret_metadata:
             for stanza in stanzas:
-                for key in stanza.keys():
+                for key in list(stanza.keys()):
                     if key.startswith("eai:"):
                         del stanza[key]
         return stanzas

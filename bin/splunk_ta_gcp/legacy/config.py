@@ -1,6 +1,9 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import json
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from splunksdc import log as logging
 
@@ -71,7 +74,7 @@ class GoogleConfig(object):
         if not data_collections:
             return []
 
-        data_collections = {k: v for k, v in data_collections.iteritems()
+        data_collections = {k: v for k, v in data_collections.items()
                             if utils.is_false(v.get(ggc.disabled))}
 
         global_settings = get_global_settings(
@@ -87,7 +90,7 @@ class GoogleConfig(object):
         keys = [ggc.index, ggc.name]
         metric_key = self._metric_key()
         all_tasks = []
-        for task in data_collections.itervalues():
+        for task in data_collections.values():
             cred_name = task[ggc.google_credentials_name]
             if cred_name not in google_creds:
                 logger.error("Invalid credential name=%s", cred_name)
@@ -175,7 +178,7 @@ def get_google_creds(server_uri, session_key, user="nobody",
         server_uri=server_uri,
         user=user,
         app=app,
-        name=urllib.quote(cred_name, safe=''),
+        name=urllib.parse.quote(cred_name, safe=''),
     )
     response, content = sr.splunkd_request(url, session_key, method="GET")
     if not response or response.status not in (200, 201):

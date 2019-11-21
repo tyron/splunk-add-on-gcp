@@ -1,3 +1,4 @@
+from builtins import object
 import tarfile
 import zipfile
 import gzip
@@ -70,7 +71,7 @@ class ArchiveFactory(object):
         first_dot = filename.find('.')
         ext = filename[first_dot:] if first_dot != -1 else ''
         ext = ext.lower()
-        matches = [key for key in self._registry.keys() if ext.endswith(key)]
+        matches = [key for key in list(self._registry.keys()) if ext.endswith(key)]
         matches = sorted(matches, key=lambda x: len(x), reverse=True)
         if matches:
             ext = matches[0]

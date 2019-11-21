@@ -1,3 +1,8 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
+import sys
 import base64
 import time
 import json
@@ -6,7 +11,7 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 import threading
-import Queue
+import queue
 from google.auth.transport.requests import AuthorizedSession
 from requests.exceptions import RequestException
 from splunksdc import logging
@@ -15,6 +20,7 @@ from splunksdc.config import StanzaParser, StringField
 from splunksdc.utils import LogExceptions, LogWith
 from splunk_ta_gcp.common.credentials import CredentialFactory
 from splunk_ta_gcp.common.settings import Settings
+
 
 
 logger = logging.get_module_logger()
@@ -56,7 +62,7 @@ class RestParcel(object):
     def has_elapsed(self):
         return self._now() - self._created
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self._messages)
 
     _datetime_format = re.compile(
@@ -65,6 +71,7 @@ class RestParcel(object):
 
     @classmethod
     def _render(cls, message):
+            
         programs = [
             cls._extract_publish_time,
             cls._extract_payload,
@@ -73,10 +80,14 @@ class RestParcel(object):
         event = OrderedDict()
         for extractor in programs:
             try:
+               
                 key, value = extractor(message)
                 event[key] = value
+                if  isinstance(event[key],bytes):
+                    event[key]=event[key].decode("utf-8")
             except KeyError:
                 continue
+        event=dict(event)
         return json.dumps(event)
 
     @classmethod
@@ -205,7 +216,7 @@ class PubSubConsumer(object):
         for _ in range(2):
             try:
                 return send_data(data, source=subscription, timeout=timeout)
-            except Queue.Full:
+            except queue.Full:
                 # server is busy, lease messages with max timeout and try again
                 parcel.renew(600)
                 timeout = parcel.ttl
@@ -246,7 +257,7 @@ class PubSubConsumerGroup(object):
         self._stopped = False
         self._threads = list()
         self._agents = list()
-        self._queue = Queue.Queue(2)
+        self._queue = queue.Queue(2)
         self._prefix = logging.ThreadLocalLoggingStack.top()
 
     def run(self):
@@ -329,7 +340,7 @@ class PubSubConsumerGroup(object):
                 op = self._queue.get(timeout=2)
                 callback(op)
                 count -= 1
-        except Queue.Empty:
+        except queue.Empty:
             logger.debug('No more pending data.')
 
     def _process_requests(self):
@@ -341,9 +352,9 @@ class PubSubConsumerGroup(object):
     def _write_indirectly(self, data, source, timeout):
         if self._stopped:
             return False
-        async = AsyncWrite(data, source)
-        self._queue.put(async, timeout=timeout)
-        return async.result()
+        async_write = AsyncWrite(data, source)
+        self._queue.put(async_write, timeout=timeout)
+        return async_write.result()
 
     def _is_stopped(self):
         return self._stopped

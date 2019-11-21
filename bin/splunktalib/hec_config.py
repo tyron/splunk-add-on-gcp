@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import object
 import traceback
 
 from splunktalib.common import logger
@@ -180,10 +182,10 @@ if __name__ == "__main__":
 
         hic.delete_http_input("akamai")
         hic.create_http_input(stanza)
-        print hic.get_http_input("akamai")
+        print(hic.get_http_input("akamai"))
         hic.delete_http_input("akamai")
         hic.update_http_input(stanza)
-        print hic.get_http_input("akamai")
+        print(hic.get_http_input("akamai"))
         limits = hic.get_limits()
         new_limit = {
             "max_content_length": int(limits["max_content_length"]) * 2

@@ -1,7 +1,11 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
 import re
 import json
 from xml.etree import cElementTree as et
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import splunktalib.rest as rest
 
@@ -189,14 +193,14 @@ class KVClient(object):
         if not owner:
             owner = "-"
 
-        app = urllib.quote(app.encode("utf-8"), "")
-        owner = urllib.quote(owner.encode("utf-8"), "")
+        app = urllib.parse.quote(app.encode("utf-8"), "")
+        owner = urllib.parse.quote(owner.encode("utf-8"), "")
 
         if collection:
-            collection = urllib.quote(collection.encode("utf-8"), "")
+            collection = urllib.parse.quote(collection.encode("utf-8"), "")
 
         if key_id:
-            key_id = urllib.quote(key_id.encode("utf-8"), "")
+            key_id = urllib.parse.quote(key_id.encode("utf-8"), "")
 
         uri = uri_template.format(self._splunkd_host, owner, app)
 
@@ -217,7 +221,7 @@ def create_collection(kv_client, collection, appname):
         not_exists = True
 
     if not_exists or not res:
-        for i in xrange(3):
+        for i in range(3):
             try:
                 kv_client.create_collection(collection, appname)
             except KVAlreadyExists:

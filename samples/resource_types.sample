@@ -1,8 +1,0 @@
-gce_instance
-pubsub_topic
-pubsub_subscription
-logging_sink
-global
-gce_disk
-cloud_function
-dataflow_job
